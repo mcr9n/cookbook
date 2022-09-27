@@ -35,17 +35,3 @@ public class Cookbook {
     }
  
     
-
-        
-        
-
-
-        
-
-
-
-
-//        String data = new String(Files.readAllBytes(Paths.get("src/main/resources/shakespeare-hamlet.txt")));
-//        data = data.toLowerCase();
-//        List<String> stopwords = Files.readAllLines(Paths.get("C:/Users/144fps/Documents/NetBeansProjects/english_stopwords.txt"));
-//        String stopwordsRegex = stopwords.stream().collect(Collectors.joining("|", "\\b(", ")\\b\\s?"));

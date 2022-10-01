@@ -20,67 +20,57 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-//we need two different returns in java methods
-final class MyResult {
-    private final String first;
-    private final String second;
 
-    public MyResult(String first, String second) {
-        this.first = first;
-        this.second = second;
-    }
 
-    public String getFirst() {
-        return first;
-    }
 
-    public String getSecond() {
-        return second;
-    }
-}
 
 
 public class Cookbook {
+    //global variables
+    public static String stopwordsRegex;
+    public static String data;
+    public static ArrayList<String> words = new ArrayList<String>();
+    public static HashMap<String, Integer> myWordsCount = new HashMap<String, Integer>();
+    public static LinkedHashMap<String, Integer> sortedMap = new LinkedHashMap<>();
     //procedures
-    //replace a char at a specific index
+    //replace a char at a specific index - aux procedure
     public static String replaceChar(String str, char ch, int index) {
     StringBuilder myString = new StringBuilder(str);
     myString.setCharAt(index, ch);
     return myString.toString();
     }
     //remove punctuations
-    public static String removePunctuations(String source) {
-		return source.replaceAll("\\p{Punct}", " ");
+    public static void removePunctuations() {
+              Cookbook.data = Cookbook.data.replaceAll("\\p{Punct}", " ");
 	}
     //removing stopwords
-    public static MyResult setup() throws IOException {
+    public static void setup() throws IOException {
         
         
         String data = new String(Files.readAllBytes(Paths.get("C:\\Users\\144fps\\Documents\\NetBeansProjects\\pride-and-prejudice.txt")));
-        data = data.toLowerCase();
+        Cookbook.data = data.toLowerCase();
         List<String>stopwords = Files.readAllLines(Paths.get("C:\\Users\\144fps\\Documents\\NetBeansProjects\\english_stopwords.txt"));
-        String stopwordsRegex = stopwords.stream().collect(Collectors.joining("|", "\\b(",")\\b\\s?"));
-        return new MyResult(data, stopwordsRegex); 
+        Cookbook.stopwordsRegex = stopwords.stream().collect(Collectors.joining("|", "\\b(",")\\b\\s?"));
+        
         
     }
-    public static String replaceRegex(String data, String stopwordsRegex) {
-        return data.replaceAll(stopwordsRegex, "");
+    public static void replaceRegex() {
+        Cookbook.data = Cookbook.data.replaceAll(stopwordsRegex, "");
     }
     //fill the array of words
-    public static ArrayList<String> FillWords(String data){
+    public static void FillWords(){
         Pattern p = Pattern.compile("[a-zA-Z]+");
-        Matcher m1 = p.matcher(data);
-        ArrayList<String> words = new ArrayList<String>();
+        Matcher m1 = p.matcher(Cookbook.data);
          while (m1.find()) {
-            words.add(m1.group());
+            Cookbook.words.add(m1.group());
         }
-        return words;
+        
     
     }
-    //fill word freqs hashmap
-    public static HashMap<String, Integer> FillWordFreqs(ArrayList<String> words){
-        HashMap<String, Integer> myWordsCount = new HashMap<String, Integer>();
-        for (String s : words){
+    //fill mywordscount hashmap
+    public static void FillWordFreqs(){
+        
+        for (String s : Cookbook.words){
         if (myWordsCount.containsKey(s)){ 
             myWordsCount.replace(s, myWordsCount.get(s) + 1);
         }
@@ -89,19 +79,18 @@ public class Cookbook {
         }
         }
     
-        return myWordsCount;
+       
     }
-    //sorting hashmap
-    public static HashMap<String, Integer> sortHashMap(HashMap<String, Integer> word_freqs){
-        LinkedHashMap<String, Integer> sortedMap = new LinkedHashMap<>();
+    //sorting mywordscount hashmap
+    public static void sortHashMap(){
         ArrayList<Integer> list = new ArrayList<>();
         
-        for (Map.Entry<String, Integer> entry : word_freqs.entrySet()) {
+        for (Map.Entry<String, Integer> entry : myWordsCount.entrySet()) {
             list.add(entry.getValue());
         }
         Collections.sort(list, Collections.reverseOrder()); 
         for (int num : list) {
-            for (Entry<String, Integer> entry : word_freqs.entrySet()) {
+            for (Entry<String, Integer> entry : myWordsCount.entrySet()) {
                 if (entry.getValue().equals(num)) {
                     sortedMap.put(entry.getKey(), num);
                 }
@@ -109,29 +98,25 @@ public class Cookbook {
         }
     
     
-        return sortedMap;
+        
     }
 
     public static void main(String[] args) throws IOException {
-     
-        ArrayList<String> words = new ArrayList<String>();
-        HashMap<String, Integer> word_freqs = new HashMap<String, Integer>();
         
-        
-        MyResult result = setup(); //creating the setup so we can start
-        String text = replaceRegex(result.getFirst(), result.getSecond()); //getting the text whitout stopwords
-        text = removePunctuations(text); //removing punctuations
-        words = FillWords(text); //filling the words array
-        word_freqs = FillWordFreqs(words); //filling the word freqs hashmap
-        HashMap<String, Integer> sorted_map = sortHashMap(word_freqs);//sorting the hashmap of freqs
+        setup(); //creating the setup so we can start
+        replaceRegex(); //getting the text whitout stopwords
+        removePunctuations(); //removing punctuations
+        FillWords(); //filling the words array
+        FillWordFreqs(); //filling mywordscount hashmap
+        sortHashMap();//sorting the hashmap of freqs
         
         
 //        showing sorted hashmap (frequencies of words ordered
         int counter = 0; //limit the operation of printing the hashmap
-        for (String chave: sorted_map.keySet()) {
+        for (String chave: sortedMap.keySet()) {
         counter += 1;
         String key = chave;
-        String value = sorted_map.get(chave).toString();
+        String value = sortedMap.get(chave).toString();
         System.out.println(key + " - " + value);
         if(counter >= 25){
         break;
